@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{reviewresponse}[2025/01/16 v2.0.1 class for writing rebuttal letters for reviews of submitted papers]
+\ProvidesClass{reviewresponse}[2025/05/03 v3.0.0 class for writing rebuttal letters for reviews of submitted papers]
 % Author: Karl-Ludwig Besser
 % Email: karl-ludwig.besser@liu.se
 
@@ -9,10 +9,17 @@
 \ProcessOptions\relax
 \LoadClass{scrartcl}
 
-
 \RequirePackage[breakable,skins]{tcolorbox}
 \RequirePackage{xcolor}
-
+\tcbset{%
+  % enhanced jigsaw,  % Makes the breakpoint sharp
+  colback=white,%
+  colframe=black,%
+  % title=Solution, % Title of the block
+  % bookmark={Q\arabic{\tcbcounter}}
+  breakable,%
+  pad at break*=1.5pc,%
+}%
 
 \newcommand*{\journal}[1]{\renewcommand*{\@journal}{#1}}
 \newcommand*{\@journal}{}
@@ -40,7 +47,6 @@
 \colorlet{colorconcludingresponseframe}{black!20}
 %%%
 
-
 %%% General Settings
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{.3em plus .2em minus .3em}
@@ -59,80 +65,100 @@
 
 %%% Commands
 \renewcommand*{\maketitle}{%
-	\begin{titlepage}
-		\begin{center}
-			\vspace*{1cm}
-			\large{Responses to Reviewers' Comments for Manuscript \@manuscript}\\
-			
-			\vspace{1cm}
-			\textbf{\LARGE{\@title}}\\
-			\vspace{1cm}
-			\large{Addressed Comments for Publication to}
-			
-			\Large{\@journal}
-			
-			\large{by}
-			
-			{\large{\@author}}
-		\end{center}
-	\end{titlepage}
+  \begin{titlepage}
+    \begin{center}
+      \vspace*{1cm} \large{Responses to Reviewers' Comments for Manuscript
+      \@manuscript}\\
+
+      \vspace{1cm} \textbf{\LARGE{\@title}}\\ \vspace{1cm}
+      \large{Addressed Comments for
+      Publication to}
+
+      \Large{\@journal}
+
+      \large{by}
+
+      {\large{\@author}}
+    \end{center}
+  \end{titlepage}
 }
 
 \newcommand*{\editor}{
-	\clearpage
-	\@ifundefined{pdfbookmark}{}{%
-		\pdfbookmark[1]{Reponse to the Editor}{hyperref@editor}%
-	}%
-	\section*{Authors' Response to the Editor}
-}
 
-\newcommand*{\reviewer}{
-	\clearpage
-	\refstepcounter{reviewer}%
-	\@ifundefined{pdfbookmark}{}{%
-		\pdfbookmark[1]{Reviewer \arabic{reviewer}}{hyperref@reviewer\arabic{reviewer}}%
-	}%
-	\section*{Authors' Response to Reviewer~\arabic{reviewer}}
+  \clearpage
+
+  \@ifundefined{pdfbookmark}{}{%
+    \pdfbookmark[1]{Reponse to the Editor}{hyperref@editor}%
+  }%
+\section*{Authors' Response to the Editor} }
+
+\RequirePackage{xparse}
+\NewDocumentCommand{\reviewer}{o}{%
+
+  \clearpage
+
+  \refstepcounter{reviewer}%
+  \IfNoValueTF{#1}{%
+    \edef\reviewerNumber{\arabic{reviewer}}%
+  }{%
+    \edef\reviewerNumber{#1}%
+  }%
+  \@ifundefined{pdfbookmark}{}{%
+    \pdfbookmark[1]{Reviewer \reviewerNumber}{hyperref@reviewer\reviewerNumber}%
+  }%
+  \section*{Authors' Response to Reviewer~\#\reviewerNumber}%
 }
-%%%
 
 %%% Blocks %%%
 \newenvironment{generalcomment}{%
-	\begin{tcolorbox}[attach title to upper, title={General Comments}, after title={.\enskip}, fonttitle={\bfseries}, coltitle={colorcommentfg}, colback={colorcommentbg}, colframe={colorcommentframe},bookmark={General Comments}]
-	}{\end{tcolorbox}}
+  \begin{tcolorbox}[attach title to upper, title={General Comments}, after
+      title={.\enskip}, fonttitle={\bfseries}, coltitle={colorcommentfg},
+    colback={colorcommentbg}, colframe={colorcommentframe},]
+  }{
+  \end{tcolorbox}
+}
 
 \newenvironment{revcomment}[1][]{\refstepcounter{revcomment}
-	\begin{tcolorbox}[adjusted title={Comment \arabic{revcomment}}, fonttitle={\bfseries}, colback={colorcommentbg}, colframe={colorcommentframe},coltitle={colorcommentbg},bookmark={Comment \arabic{revcomment}},#1]
-	}{\end{tcolorbox}}
+  \begin{tcolorbox}[skin=bicolor, colbacklower=white, adjusted title={Comment
+      \arabic{revcomment}}, fonttitle={\bfseries}, colback={colorcommentbg},
+    colframe={colorcommentframe},coltitle={colorcommentbg},#1]
+  }{
+  \end{tcolorbox}
+}
 
 \newenvironment{revresponse}[1][{Thank you for the comment.}]{%
-	\textbf{Response:} #1\par
-}{\vspace{4em plus 0.2em minus 1.5em}}
+\textbf{Response:} #1\par }{\vspace{1em plus 0.2em minus 0.5em}}
 
 \newenvironment{concludingresponse}[1][]{%
-	\begin{tcolorbox}[attach title to upper, breakable, title={Concluding Response #1}, after title={.\enskip}, fonttitle={\bfseries}, coltitle={colorconcludingresponsefg}, colback={colorconcludingresponsebg}, colframe={colorconcludingresponseframe},]
-	}{\end{tcolorbox}}
+  \begin{tcolorbox}[attach title to upper, breakable,
+      title={Concluding Response #1},
+      after title={.\enskip}, fonttitle={\bfseries},
+      coltitle={colorconcludingresponsefg},
+      colback={colorconcludingresponsebg},
+    colframe={colorconcludingresponseframe},]
+  }{
+  \end{tcolorbox}
+}
 
-\newenvironment{changes}{\begin{tcolorbox}[breakable,colback={colorchangebg}, colframe={colorchangeframe},enhanced jigsaw,]
-	}{\end{tcolorbox}}
+\newenvironment{changes}{
+  \begin{tcolorbox}[breakable,colback={colorchangebg},
+    colframe={colorchangeframe},enhanced jigsaw,]
+  }{
+  \end{tcolorbox}
+}
 
-\newcommand{\printpartbibliography}[1]{\begin{refsegment}\nocite{#1}\printbibliography[heading=none,segment=\therefsegment]\end{refsegment}}
-
+\newcommand{\printpartbibliography}[1]{
+  \begin{refsegment}
+    \nocite{#1}\printbibliography[heading=none,segment=\therefsegment]
+  \end{refsegment}
+}
 
 \providecommand*{\revcommentautorefname}{Comment}
 \AddToHook{package/hyperref/after}{
-	\hypersetup{
-		bookmarksopen,
-		pdfcreator={LaTeX with the reviewresponse package},
-	}
-}
-\AddToHook{begindocument/before}{
-	\IfPackageLoadedTF{hyperref}{
-		\hypersetup{
-			pdfauthor={\@author},
-			pdftitle={Review Response -- \@title{}},
-			pdfkeywords={\@journal{}, \@manuscript{}, review response}
-		}
-	}{}
-}
+  \hypersetup{ bookmarksopen, pdfcreator={LaTeX with the reviewresponse
+package}, } }
+\AddToHook{begindocument/before}{ \IfPackageLoadedTF{hyperref}{ \hypersetup{
+      pdfauthor={\@author}, pdftitle={Review Response -- \@title{}},
+pdfkeywords={\@journal{}, \@manuscript{}, review response} } }{} }
 \AddToHook{begindocument/end}{\def\sectionautorefname{Reviewer}}
+
